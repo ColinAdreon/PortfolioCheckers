@@ -13,8 +13,8 @@
 
 typedef __uint32_t uint32; // 'cuz underscores are too much work
 
-const int DIFF = 3; // depth of minimax tree, works from 3 to 7
-					// I recommend no higher than 4, otherwise the tree gets
+const int DIFF = 6; // depth of minimax tree, works from 3 to 7
+					// I recommend sktarting small, otherwise the tree gets
 					// very large and you risk running out of heap space
 					// If a seg fault occurs, this is why
 

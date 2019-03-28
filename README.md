@@ -1,2 +1,5 @@
-readme
+CHECKERS
 
+This game of checkers can be played by one or two players.  The program can be cloned from GitHub.  To compile the program, use the provided makefile by typing `make` into the terminal.  To run the executable, simply type `./checkers` into the terminal.  Once opened, you can use the arrow and enter keys to select a menu option.  During gameplay, use the arrow keys to higlight a piece.  Press enter to select the highlighted piece.  Once selected, the piece should turn green.  To choose a square to move to, use the left and right arrow keys.  The destination square will be yellow if a jump will be made, or blue if no jump is to be made.  Press enter to confirm movement to the highlighted square.  You can deselct an incorrectly selected piece with the backspace button.
+
+Caution: The AI used in single-player mode recursively searches a very large tree.  This can cause memory to be very limited.  If you find yourself running out of memory, you can set the `DIFF` parameter on line 16 in the file `initFunctions.h` to be lower, which will decrease the size of the tree.  Be careful not to set `DIFF` to be lower than `3` or higher than `7`.
