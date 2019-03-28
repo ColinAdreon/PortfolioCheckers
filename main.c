@@ -141,12 +141,10 @@ int main() {
 						movePiece(csp, cpt, jmp, board, gameWind);
 						draw(csp, board, gameWind, 0);
 						tree = humanMove(csp, cpt, jmp, board);
-						//printr(tree->info);
 					}
 
 					else { // AI turn loop
 						AImove = chooseMove(tree);
-						//printr(AImove);
 						csp = (AImove / 0x200) & 0x1F;
 						cpt = (AImove / 0x10) & 0x1F;
 						jmp = jumpedSquare(csp, cpt);
@@ -166,7 +164,7 @@ int main() {
 			else winsBlack++;
 			gameWind = newwin(8, 32, 8, 10);
 			if (initEndScreen(gameWind)) gameMode = 0;
-			else done = 0;
+			done = 0;
 			boardLayout(board);
 			delwin(gameWind);
 
@@ -217,9 +215,6 @@ int main() {
 						} while ((key != 10 && key != KEY_ENTER) || !(moveable & (int)pwr(2, csp)));
 
 						draw(csp, board, gameWind, 2);
-						// wgetch(gameWind);
-						// if (jmp) cpt = jumpDirection(KEY_LEFT, csp, 32, board);
-						// else 	 cpt = moveDirection(KEY_LEFT, csp, 32, board);
 						key = KEY_LEFT;
 
 						do { // handles direction
@@ -247,7 +242,7 @@ int main() {
 			else winsBlack++;
 			gameWind = newwin(8, 32, 8, 10);
 			if (initEndScreen(gameWind)) gameMode = 0;
-			else done = 0;
+			done = 0;
 			boardLayout(board);
 			delwin(gameWind);
 		}
@@ -285,7 +280,7 @@ int moveDirection(int key, int piece, int old, Square board[32]) {
 		if (key == KEY_LEFT || key == KEY_RIGHT) {
 			if (old == board[piece].se->sqNum && !board[piece].sw->occ)
 				return board[piece].sw->sqNum;
-			if (old == board[piece].sw->sqNum && !board[piece].se->occ)
+			else //if (old == board[piece].sw->sqNum && !board[piece].se->occ)
 				return board[piece].se->sqNum;
 		}
 		else return old;
@@ -298,7 +293,7 @@ int moveDirection(int key, int piece, int old, Square board[32]) {
 		if (key == KEY_LEFT || key == KEY_RIGHT) {
 			if (old == board[piece].ne->sqNum && !board[piece].nw->occ)
 				return board[piece].nw->sqNum;
-			if (old == board[piece].nw->sqNum && !board[piece].ne->occ)
+			else //if (old == board[piece].nw->sqNum && !board[piece].ne->occ)
 				return board[piece].ne->sqNum;
 		}
 		else return old;
@@ -365,7 +360,7 @@ int moveDirection(int key, int piece, int old, Square board[32]) {
 
 int jumpDirection(int key, int piece, int old, Square board[32]) {
 	if (key == KEY_BACKSPACE) return piece;
-	if (board[piece].occ == 1) { // this needs checking for legality
+	if (board[piece].occ == 1) {
 		if (board[piece].se && !(board[piece].sw && board[piece].sw->sw))
 			return board[piece].se->se->sqNum;
 		if (board[piece].sw && !(board[piece].se && board[piece].se->se))
@@ -376,7 +371,7 @@ int jumpDirection(int key, int piece, int old, Square board[32]) {
 					return board[piece].sw->sw->sqNum;
 				else return board[piece].se->se->sqNum;
 			}
-			else {//if (old == board[piece].sw->sw->sqNum) {
+			else { // if (old == board[piece].sw->sw->sqNum)
 				if (board[piece].se->occ < 0 && !board[piece].se->se->occ)
 					return board[piece].se->se->sqNum;
 				else return board[piece].sw->sw->sqNum;
@@ -395,7 +390,7 @@ int jumpDirection(int key, int piece, int old, Square board[32]) {
 					return board[piece].nw->nw->sqNum;
 				else return board[piece].ne->ne->sqNum;
 			}
-			else {//if (old == board[piece].nw->nw->sqNum) {
+			else { // if (old == board[piece].nw->nw->sqNum)
 				if (board[piece].ne->occ > 0 && !board[piece].ne->ne->occ)
 					return board[piece].ne->ne->sqNum;
 				else return board[piece].nw->nw->sqNum;
@@ -403,62 +398,71 @@ int jumpDirection(int key, int piece, int old, Square board[32]) {
 		}
 		else return old;
 	}
+
 	switch (key) {
 		case KEY_LEFT:
 			if 		(board[piece].ne && board[piece].ne->ne && old == board[piece].ne->ne->sqNum) {
-				if  (board[piece].nw && board[piece].nw->nw && !board[piece].nw->nw->occ && board[piece].occ * board[piece].nw->occ == -2) return board[piece].nw->nw->sqNum;
-				if  (board[piece].sw && board[piece].sw->sw && !board[piece].sw->sw->occ && board[piece].occ * board[piece].sw->occ == -2) return board[piece].sw->sw->sqNum;
-				if  (board[piece].se && board[piece].se->se && !board[piece].se->se->occ && board[piece].occ * board[piece].se->occ == -2) return board[piece].se->se->sqNum;
-				else				 return old;
+				if  (board[piece].nw && board[piece].nw->nw && !board[piece].nw->nw->occ && board[piece].occ * board[piece].nw->occ <= -2) return board[piece].nw->nw->sqNum;
+				if  (board[piece].sw && board[piece].sw->sw && !board[piece].sw->sw->occ && board[piece].occ * board[piece].sw->occ <= -2) return board[piece].sw->sw->sqNum;
+				if  (board[piece].se && board[piece].se->se && !board[piece].se->se->occ && board[piece].occ * board[piece].se->occ <= -2) return board[piece].se->se->sqNum;
+				else return old;
 			}
 			else if (board[piece].se && board[piece].se->se && old == board[piece].se->se->sqNum) {
-				if  (board[piece].ne && board[piece].ne->ne && !board[piece].ne->ne->occ && board[piece].occ * board[piece].ne->occ == -2) return board[piece].ne->ne->sqNum;
-				if  (board[piece].nw && board[piece].nw->nw && !board[piece].nw->nw->occ && board[piece].occ * board[piece].nw->occ == -2) return board[piece].nw->nw->sqNum;
-				if  (board[piece].sw && board[piece].sw->sw && !board[piece].sw->sw->occ && board[piece].occ * board[piece].sw->occ == -2) return board[piece].sw->sw->sqNum;
-				else				 return old;
+				if  (board[piece].ne && board[piece].ne->ne && !board[piece].ne->ne->occ && board[piece].occ * board[piece].ne->occ <= -2) return board[piece].ne->ne->sqNum;
+				if  (board[piece].nw && board[piece].nw->nw && !board[piece].nw->nw->occ && board[piece].occ * board[piece].nw->occ <= -2) return board[piece].nw->nw->sqNum;
+				if  (board[piece].sw && board[piece].sw->sw && !board[piece].sw->sw->occ && board[piece].occ * board[piece].sw->occ <= -2) return board[piece].sw->sw->sqNum;
+				else return old;
 			}
 			else if (board[piece].sw && board[piece].sw->sw && old == board[piece].sw->sw->sqNum) {
-				if  (board[piece].se && board[piece].se->se && !board[piece].se->se->occ && board[piece].occ * board[piece].se->occ == -2) return board[piece].se->se->sqNum;
-				if  (board[piece].ne && board[piece].ne->ne && !board[piece].ne->ne->occ && board[piece].occ * board[piece].ne->occ == -2) return board[piece].ne->ne->sqNum;
-				if  (board[piece].nw && board[piece].nw->nw && !board[piece].nw->nw->occ && board[piece].occ * board[piece].nw->occ == -2) return board[piece].nw->nw->sqNum;
-				else				 return old;
+				if  (board[piece].se && board[piece].se->se && !board[piece].se->se->occ && board[piece].occ * board[piece].se->occ <= -2) return board[piece].se->se->sqNum;
+				if  (board[piece].ne && board[piece].ne->ne && !board[piece].ne->ne->occ && board[piece].occ * board[piece].ne->occ <= -2) return board[piece].ne->ne->sqNum;
+				if  (board[piece].nw && board[piece].nw->nw && !board[piece].nw->nw->occ && board[piece].occ * board[piece].nw->occ <= -2) return board[piece].nw->nw->sqNum;
+				else return old;
 			}
 			else {
-				if (board[piece].sw && board[piece].sw->sw && !board[piece].sw->sw->occ && board[piece].occ * board[piece].sw->occ == -2) return board[piece].sw->sw->sqNum;
-				if (board[piece].se && board[piece].se->se && !board[piece].se->se->occ && board[piece].occ * board[piece].se->occ == -2) return board[piece].se->se->sqNum;
-				if (board[piece].ne && board[piece].ne->ne && !board[piece].ne->ne->occ && board[piece].occ * board[piece].ne->occ == -2) return board[piece].ne->ne->sqNum;
-				if (board[piece].nw && board[piece].nw->nw && !board[piece].nw->nw->occ && board[piece].occ * board[piece].nw->occ == -2) return board[piece].nw->nw->sqNum;
-				else				 return old;
+				if  (board[piece].sw && board[piece].sw->sw && !board[piece].sw->sw->occ && board[piece].occ * board[piece].sw->occ <= -2) return board[piece].sw->sw->sqNum;
+				if  (board[piece].se && board[piece].se->se && !board[piece].se->se->occ && board[piece].occ * board[piece].se->occ <= -2) return board[piece].se->se->sqNum;
+				if  (board[piece].ne && board[piece].ne->ne && !board[piece].ne->ne->occ && board[piece].occ * board[piece].ne->occ <= -2) return board[piece].ne->ne->sqNum;
+				if  (board[piece].nw && board[piece].nw->nw && !board[piece].nw->nw->occ && board[piece].occ * board[piece].nw->occ <= -2) return board[piece].nw->nw->sqNum;
+				else return old;
 			}
 			break;
 		case KEY_RIGHT:
 			if 		(board[piece].ne && board[piece].ne->ne && old == board[piece].ne->ne->sqNum) {
-				if  (board[piece].se && board[piece].se->se && !board[piece].se->se->occ && board[piece].occ * board[piece].se->occ == -2) return board[piece].se->se->sqNum;
-				if  (board[piece].sw && board[piece].sw->sw && !board[piece].sw->sw->occ && board[piece].occ * board[piece].sw->occ == -2) return board[piece].sw->sw->sqNum;
-				if  (board[piece].nw && board[piece].nw->nw && !board[piece].nw->nw->occ && board[piece].occ * board[piece].nw->occ == -2) return board[piece].nw->nw->sqNum;
-				else				 return old;
+				if  (board[piece].se && board[piece].se->se && !board[piece].se->se->occ && board[piece].occ * board[piece].se->occ <= -2) return board[piece].se->se->sqNum;
+				if  (board[piece].sw && board[piece].sw->sw && !board[piece].sw->sw->occ && board[piece].occ * board[piece].sw->occ <= -2) return board[piece].sw->sw->sqNum;
+				if  (board[piece].nw && board[piece].nw->nw && !board[piece].nw->nw->occ && board[piece].occ * board[piece].nw->occ <= -2) return board[piece].nw->nw->sqNum;
+				else return old;
 			}
 			else if (board[piece].se && board[piece].se->se && old == board[piece].se->se->sqNum) {
-				if  (board[piece].sw && board[piece].sw->sw && !board[piece].sw->sw->occ && board[piece].occ * board[piece].sw->occ == -2) return board[piece].sw->sw->sqNum;
-				if  (board[piece].nw && board[piece].nw->nw && !board[piece].nw->nw->occ && board[piece].occ * board[piece].nw->occ == -2) return board[piece].nw->nw->sqNum;
-				if  (board[piece].ne && board[piece].ne->ne && !board[piece].ne->ne->occ && board[piece].occ * board[piece].ne->occ == -2) return board[piece].ne->ne->sqNum;
-				else				 return old;
+				if  (board[piece].sw && board[piece].sw->sw && !board[piece].sw->sw->occ && board[piece].occ * board[piece].sw->occ <= -2) return board[piece].sw->sw->sqNum;
+				if  (board[piece].nw && board[piece].nw->nw && !board[piece].nw->nw->occ && board[piece].occ * board[piece].nw->occ <= -2) return board[piece].nw->nw->sqNum;
+				if  (board[piece].ne && board[piece].ne->ne && !board[piece].ne->ne->occ && board[piece].occ * board[piece].ne->occ <= -2) return board[piece].ne->ne->sqNum;
+				else return old;
 			}
 			else if (board[piece].sw && board[piece].sw->sw && old == board[piece].sw->sw->sqNum) {
-				if  (board[piece].nw && board[piece].nw->nw && !board[piece].nw->nw->occ && board[piece].occ * board[piece].nw->occ == -2) return board[piece].nw->nw->sqNum;
-				if  (board[piece].ne && board[piece].ne->ne && !board[piece].ne->ne->occ && board[piece].occ * board[piece].ne->occ == -2) return board[piece].ne->ne->sqNum;
-				if  (board[piece].se && board[piece].se->se && !board[piece].se->se->occ && board[piece].occ * board[piece].se->occ == -2) return board[piece].se->se->sqNum;
-				else				 return old;
+				if  (board[piece].nw && board[piece].nw->nw && !board[piece].nw->nw->occ && board[piece].occ * board[piece].nw->occ <= -2) return board[piece].nw->nw->sqNum;
+				if  (board[piece].ne && board[piece].ne->ne && !board[piece].ne->ne->occ && board[piece].occ * board[piece].ne->occ <= -2) return board[piece].ne->ne->sqNum;
+				if  (board[piece].se && board[piece].se->se && !board[piece].se->se->occ && board[piece].occ * board[piece].se->occ <= -2) return board[piece].se->se->sqNum;
+				else return old;
 			}
 			else {
-				if (board[piece].ne && board[piece].ne->ne && !board[piece].ne->ne->occ && board[piece].occ * board[piece].ne->occ == -2) return board[piece].ne->ne->sqNum;
-				if (board[piece].se && board[piece].se->se && !board[piece].se->se->occ && board[piece].occ * board[piece].se->occ == -2) return board[piece].se->se->sqNum;
-				if (board[piece].sw && board[piece].sw->sw && !board[piece].sw->sw->occ && board[piece].occ * board[piece].sw->occ == -2) return board[piece].sw->sw->sqNum;
-				if (board[piece].nw && board[piece].nw->nw && !board[piece].nw->nw->occ && board[piece].occ * board[piece].nw->occ == -2) return board[piece].nw->nw->sqNum;
-				else				 return old;
+				if  (board[piece].ne && board[piece].ne->ne && !board[piece].ne->ne->occ && board[piece].occ * board[piece].ne->occ <= -2) return board[piece].ne->ne->sqNum;
+				if  (board[piece].se && board[piece].se->se && !board[piece].se->se->occ && board[piece].occ * board[piece].se->occ <= -2) return board[piece].se->se->sqNum;
+				if  (board[piece].sw && board[piece].sw->sw && !board[piece].sw->sw->occ && board[piece].occ * board[piece].sw->occ <= -2) return board[piece].sw->sw->sqNum;
+				if  (board[piece].nw && board[piece].nw->nw && !board[piece].nw->nw->occ && board[piece].occ * board[piece].nw->occ <= -2) return board[piece].nw->nw->sqNum;
+				else return old;
 			}
 			break;
 		default:
+			if (piece - old != 9 && piece - old != -9 &&
+				piece - old != 7 && piece - old != -7) {
+
+				if  (board[piece].ne && board[piece].ne->ne && !board[piece].ne->ne->occ && board[piece].occ * board[piece].ne->occ <= -2) return board[piece].ne->ne->sqNum;
+				if  (board[piece].se && board[piece].se->se && !board[piece].se->se->occ && board[piece].occ * board[piece].se->occ <= -2) return board[piece].se->se->sqNum;
+				if  (board[piece].sw && board[piece].sw->sw && !board[piece].sw->sw->occ && board[piece].occ * board[piece].sw->occ <= -2) return board[piece].sw->sw->sqNum;
+				if  (board[piece].nw && board[piece].nw->nw && !board[piece].nw->nw->occ && board[piece].occ * board[piece].nw->occ <= -2) return board[piece].nw->nw->sqNum;
+			}
 			return old;
 	}
 }

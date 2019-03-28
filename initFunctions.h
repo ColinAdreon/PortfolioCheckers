@@ -13,9 +13,10 @@
 
 typedef __uint32_t uint32; // 'cuz underscores are too much work
 
-const int DIFF = 4; // depth of minimax tree, works up to 7
+const int DIFF = 3; // depth of minimax tree, works from 3 to 7
 					// I recommend no higher than 4, otherwise the tree gets
-					// very large and you running out of heap space
+					// very large and you risk running out of heap space
+					// If a seg fault occurs, this is why
 
 
 const int xPositions[32]	 = {1, 3, 5, 7, 0, 2, 4, 6,
@@ -539,7 +540,7 @@ void printr(uint32 move) {
 }
 */
 
-// Degenrate case calculations, no recursion
+// Degenerate case calculations, no recursion
 int getHeuristic(uint32 white, uint32 black, uint32 kings) {
 	uint32 wk = kings & white;
 	uint32 bk = kings & black;
@@ -781,14 +782,12 @@ uint32 getMoves(uint32 previous, uint32 left, uint32 white, uint32 black, uint32
 					moves /= 2;
 				}
 			}
-			//printf("%d - ", sel);
 			if (((turn) ? (d > 27) : (d < 4)) && !(kings & pwr(2, d)))
 				crown = 0x80000;
 			return crown + sel * 0x200 + d * 0x10 + turn + level;
 		}
 		sel++;
 	}
-	//printf("no moves\n");
 	// already gave all available moves
 	return 0;
 }
@@ -869,9 +868,13 @@ void destroy(Node * node) {
 
 uint32 chooseMove(Node * tree) {
 	Node * tmp = tree->chl;
-	while (tmp->sib && tmp->heur != tree->heur) tmp = tmp->sib;
-
 	uint32 info = tmp->info;
+	int heur = tmp->heur;
+	while (tmp && tmp->sib) {
+		if (tmp->heur > heur) info = tmp->info;
+		tmp = tmp->sib;
+	}
+
 	destroy(tree);	// I know, rebuilding the tree each time is more work,
 						// but it simplifies the heuristics calculations
 						// and minimax algorithms
